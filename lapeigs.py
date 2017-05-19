@@ -110,11 +110,17 @@ def visualize3DData( data, edata, c):
 	ax1.set_zlabel('z')
 	ax1.set_title('Original Data')
 
-	ax2  = fig.add_subplot(212, projection='3d')
-	ax2.scatter( edata[:,0], edata[:,1], edata[:,2], c=c)
+	if (edata.shape[1] == 3):
+		ax2  = fig.add_subplot(212, projection='3d')
+		ax2.scatter( edata[:,0], edata[:,1], edata[:,2], c=c)
+		ax2.set_zlabel('z')
+	else:
+		ax2  = fig.add_subplot(212,)
+		ax2.scatter( edata[:,0], edata[:,1], c=c)
+		
+
 	ax2.set_xlabel('x')
-	ax2.set_ylabel('y')
-	ax2.set_zlabel('z')
+	ax2.set_ylabel('y')	
 	ax2.set_title('Embedded Data')
 
 	plt.show()
@@ -131,10 +137,10 @@ if __name__=='__main__':
 	# data = readFromFile('swissroll_data.csv');
 
 	# Compute the graph Laplacian
-	l = buildGraphLaplacian( data, .5, 21)
+	l = buildGraphLaplacian( data, 5, 21)
 
 	# Embed onto the first three nontrivial eigenvectors
-	embedded_data = computeGraphEmbedding( l, (1,2,3) )
+	embedded_data = computeGraphEmbedding( l, (1,2) )
 
 	# Visualize embedding
 	visualize3DData( data, embedded_data, range(0,len(data)) )
