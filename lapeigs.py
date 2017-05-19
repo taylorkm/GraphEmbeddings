@@ -137,7 +137,7 @@ if __name__=='__main__':
 	# data = readFromFile('swissroll_data.csv');
 
 	# Compute the graph Laplacian
-	l = buildGraphLaplacian( data, 5, 21)
+	l = buildGraphLaplacian( data, 2, 21)
 
 	# Embed onto the first three nontrivial eigenvectors
 	embedded_data = computeGraphEmbedding( l, (1,2) )
