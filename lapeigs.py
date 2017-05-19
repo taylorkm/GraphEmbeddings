@@ -29,7 +29,6 @@ def readFromFile( filename = 'data.csv' ):
 	return np.array(data)
 
 
-
 # Write data to CSV file, each row represents a new datapoint.
 def writeToFile( iterable_data_object, filename = 'data.csv' ):
 	if ( os.path.isfile(filename) ):
@@ -39,11 +38,6 @@ def writeToFile( iterable_data_object, filename = 'data.csv' ):
 	with open(filename, 'wb') as f:
 		writer = csv.writer(f)
 		writer.writerows(iterable_data_object)
-
-
-
-
-
 
 
 def buildGraphLaplacian( data, sigma, nnn ):
@@ -90,19 +84,7 @@ def buildGraphLaplacian( data, sigma, nnn ):
 
 	return np.eye(N) - l
 
-
-
-# Build a circle dataset.
-def buildCircle( number_of_samples = 100 ):
-	t = np.linspace(0, np.pi*2, number_of_samples )
-	x = np.cos(t[:-1])
-	y = np.sin(t[:-1])
-	data = np.stack((x,y),0).T
-	return np.array(data)
-
-
 	
-
 # Build a swiss roll dataset.
 def buildSwissRoll( number_of_samples = 1500 ):
 	t = np.linspace(0, np.pi*4, number_of_samples )[:-1]
@@ -113,16 +95,10 @@ def buildSwissRoll( number_of_samples = 1500 ):
 	return np.array(data)
 
 
-
-	
-
 def computeGraphEmbedding( graphLaplacian, myrange):
 	# Compute dominant eigenvectors
 	eigvals, eigvecs = sp.linalg.eigh( l, eigvals=(0,max(myrange)) )
 	return eigvecs[:,myrange]
-
-
-
 
 
 def visualize3DData( data, edata, c):
@@ -144,15 +120,14 @@ def visualize3DData( data, edata, c):
 	plt.show()
 
 
-
-
 # Demonstrate the work flow 
 if __name__=='__main__':
 	
-	data = buildSwissRoll()
-	# writeToFile(data, 'swissroll_data.csv');
+	# Build data then save it
+	data = buildSwissRoll()	
+	writeToFile(data, 'swissroll_data.csv');
 
-	# Read input data
+	# Or read input data
 	# data = readFromFile('swissroll_data.csv');
 
 	# Compute the graph Laplacian
@@ -162,31 +137,4 @@ if __name__=='__main__':
 	embedded_data = computeGraphEmbedding( l, (1,2,3) )
 
 	# Visualize embedding
-
 	visualize3DData( data, embedded_data, range(0,len(data)) )
-
-
-	
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
