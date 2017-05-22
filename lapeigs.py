@@ -1,5 +1,6 @@
 import numpy as np
 import scipy as sp
+import itertools 
 from sklearn.neighbors import NearestNeighbors as nnc
 from scipy.sparse import coo_matrix
 import csv # for reading and writing to CSV
@@ -40,7 +41,7 @@ def writeToFile( iterable_data_object, filename = 'data.csv' ):
 		writer.writerows(iterable_data_object)
 
 
-def buildGraphLaplacian( data, sigma, nnn ):
+def buildGraphLaplacian( data, **kwargs ):
 	# INPUT:
 	# data is a N-by-d matrix of N points in d dimensions
 	#
@@ -56,6 +57,16 @@ def buildGraphLaplacian( data, sigma, nnn ):
 	# Laplacian. It's eigenvalues 0=\lambda_0 < \lambda_1 < ...
 	# are associated with the eigenvectors that oscillate
 	# the least over the graph.
+
+	if "sigma" in kwargs:
+		sigma = kwargs["sigma"]
+	else:
+		sigma = float('inf')
+
+	if "nnn" in kwargs:
+		nnn = kwargs["nnn"]
+	else:
+		nnn = 4
 
 	distToWeight = lambda d, sigma: np.exp( - (d / sigma) ** 2 )
 
@@ -76,8 +87,14 @@ def buildGraphLaplacian( data, sigma, nnn ):
 
 	# symmetrize
 	w = (w+w.T)/2
+	
 	d = np.sum( w, axis = 1)
+	l = np.dot( np.diag( 1./d ) , w )
+	l = np.dot( l, np.diag( 1./d ) )	
 
+	# l is the normalized graph laplacian; this will 
+	# corrects for irregular sampling density
+	w = l	
 	d = np.sqrt( np.sum( w, axis = 1) )
 	l = np.dot( np.diag( 1./d ) , w )
 	l = np.dot( l, np.diag( 1./d ) )
@@ -85,13 +102,20 @@ def buildGraphLaplacian( data, sigma, nnn ):
 	return np.eye(N) - l
 
 	
+# For parametrizing a 2D surface
+def r(u,v):
+	return [(1-u/ np.pi / 5)*np.cos(u), (1-u/ np.pi / 5)*np.sin(u), v] # swiss roll
+
+
 # Build a swiss roll dataset.
-def buildSwissRoll( number_of_samples = 1500 ):
-	t = np.linspace(0, np.pi*4, number_of_samples )[:-1]
-	x = (1-t/ np.pi / 5)*np.cos(t)
-	y = (1-t/ np.pi / 5)*np.sin(t)
-	z = 2*np.random.rand(number_of_samples-1)#np.mod(43*t,1)
-	data = np.stack((x,y,z),0).T
+def buildSwissRoll( number_of_datapoints = 1500 ):
+
+	tgrid =  sorted( 4*np.pi * np.random.rand( number_of_datapoints ) )
+ 	
+ 	data = []
+	for i in xrange(number_of_datapoints):
+		data.append( r( tgrid[i], 4*np.random.rand()-2 ) )
+	
 	return np.array(data)
 
 
@@ -130,14 +154,14 @@ def visualize3DData( data, edata, c):
 if __name__=='__main__':
 	
 	# Build data then save it
-	data = buildSwissRoll()	
-	writeToFile(data, 'swissroll_data.csv');
+	# data = buildSwissRoll()	
+	# writeToFile(data, 'swissroll_data.csv');
 
 	# Or read input data
-	# data = readFromFile('swissroll_data.csv');
+	data = readFromFile('swissroll_data.csv');
 
 	# Compute the graph Laplacian
-	l = buildGraphLaplacian( data, 2, 21)
+	l = buildGraphLaplacian( data, nnn=11, sigma = .25)
 
 	# Embed onto the first three nontrivial eigenvectors
 	embedded_data = computeGraphEmbedding( l, (1,2) )
