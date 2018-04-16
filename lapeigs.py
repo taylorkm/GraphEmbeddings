@@ -22,7 +22,6 @@ def readFromFile( filename = 'data.csv' ):
     with open(filename, 'r') as f:
         reader = csv.reader(f)
         data   = [list(map(lambda x: float(x), row)) for row in reader]
-        print('oh dears')
         # each element of data is a list, representing a row of the file
 
     return np.array(data)
