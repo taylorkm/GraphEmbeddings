@@ -116,9 +116,9 @@ def buildSwissRoll( number_of_datapoints = 1500 ):
     return np.array(data)
 
 
-def computeGraphEmbedding( graphLaplacian, myrange):
+def computeGraphEmbedding(graphLaplacian, myrange):
     # Compute dominant eigenvectors
-    eigvals, eigvecs = sp.linalg.eigh(l, eigvals=(0, max(myrange)) )
+    eigvals, eigvecs = sp.linalg.eigh(graphLaplacian, eigvals=(0, max(myrange)) )
     return eigvecs[:,myrange]
 
 
